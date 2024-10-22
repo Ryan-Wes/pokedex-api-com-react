@@ -1,6 +1,6 @@
 // src/pages/PokemonDetail.js
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Adiciona o useNavigate
 import styled from 'styled-components';
 
 // Define as cores para os tipos de Pokémon
@@ -26,6 +26,27 @@ const typeColors = {
   // Adicione mais tipos conforme necessário
 };
 
+const BackButton = styled.button`
+  display: flex;
+  align-itens: center;
+  justify-content: center;
+  background-color: red;
+  border: none;
+  color: white;
+  padding: 20px 10px;
+  font-size: 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin-top: 15px;
+  margin-left: 15px;
+
+
+  &:hover {
+    background-color: black;
+  }
+`;
+
 const Container = styled.div`
   padding: 20px;
   text-align: center;
@@ -45,6 +66,17 @@ const Header = styled.div`
   justify-content: space-around;
   margin-bottom: 20px; /* Espaço abaixo do cabeçalho */
 `;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 10px; /* Espaçamento ao redor do botão */
+  z-index: 10;
+`;
+
 
 const Image = styled.img`
   width: 250px; /* Aumentar a imagem */
@@ -112,11 +144,13 @@ const MoveItem = styled.div`
   color: #fff; /* Cor do texto */
 `;
 
+
 const PokemonDetail = () => {
   const { name } = useParams();
   const [pokemon, setPokemon] = useState(null);
   const [abilitiesDescriptions, setAbilitiesDescriptions] = useState([]);
   const [moves, setMoves] = useState([]);
+  const navigate = useNavigate(); // Inicializa o useNavigate
 
   useEffect(() => {
     const fetchPokemonDetails = async () => {
@@ -129,10 +163,10 @@ const PokemonDetail = () => {
         const abilitiesPromises = data.abilities.map(async (ability) => {
           const abilityResponse = await fetch(ability.ability.url);
           const abilityData = await abilityResponse.json();
-          
+
           // Aqui pegamos a descrição em inglês
           const effect = abilityData.effect_entries.find(entry => entry.language.name === 'en')?.effect;
-          
+
           return { name: ability.ability.name, effect }; // Pega o nome e a descrição
         });
 
@@ -161,7 +195,18 @@ const PokemonDetail = () => {
   }
 
   return (
+
+    <>
+
+    <ButtonContainer>
+        <BackButton onClick={() => navigate('/')}>
+          Home
+        </BackButton>
+      </ButtonContainer>
+
     <Container>
+      
+
       <Header>
         <Image src={pokemon.sprites.other['official-artwork'].front_default} alt={pokemon.name} />
         <TextContainer>
@@ -179,7 +224,7 @@ const PokemonDetail = () => {
         <List>
           {abilitiesDescriptions.map((ability) => (
             <ListItem key={ability.name}>
-              <strong>{ability.name}</strong>: {ability.effect} {/* Exibe a descrição */}
+              <strong>{ability.name}</strong>: {ability.effect}
             </ListItem>
           ))}
         </List>
@@ -196,6 +241,7 @@ const PokemonDetail = () => {
         </MoveContainer>
       </Section>
     </Container>
+    </>
   );
 };
 

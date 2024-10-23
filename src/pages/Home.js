@@ -30,10 +30,37 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const Title = styled.h1`
-  text-align: center;
-  margin-bottom: 20px;
-  color: white;
+const TitleImage = styled.img`
+  display: block;
+  margin: 0 auto 20px; /* Centraliza a imagem e adiciona margem inferior */
+  width: 200px; /* Define uma largura para a imagem, ajuste conforme necessário */
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  max-width: 400px; /* Limitar a largura máxima do campo de pesquisa */
+  padding: 10px;
+  margin: 10px 5px 10px 0; /* Margem à direita de 5px para o espaçamento */
+  display: block; /* Permitir margin auto */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const Dropdown = styled.select`
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: black;
+  background: white; /* Define o fundo como branco */
+  width: 5px;
+  cursor: pointer;
+`;
+
+const FilterContainer = styled.div`
+  display: flex; /* Usar flexbox para alinhamento */
+  justify-content: center; /* Centraliza os itens */
+  align-items: center; /* Alinha verticalmente */
+  margin-bottom: 20px; /* Espaço abaixo do filtro */
 `;
 
 const PokemonList = styled.div`
@@ -87,11 +114,14 @@ const LoadMoreButton = styled.button`
 
 const Home = () => {
   const [pokemons, setPokemons] = useState([]);
+  const [allPokemons, setAllPokemons] = useState([]); // Novo estado para armazenar todos os Pokémons
   const [offset, setOffset] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState(''); // Estado para o tipo selecionado
 
   useEffect(() => {
     fetchPokemons();
-  }, [offset]); // Busca os pokémons sempre que o offset mudar
+  }, [offset]);
 
   const fetchPokemons = async () => {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`);
@@ -113,17 +143,42 @@ const Home = () => {
     );
 
     setPokemons((prev) => [...prev, ...pokemonDetails]);
+    setAllPokemons((prev) => [...prev, ...pokemonDetails]); // Atualiza o estado com todos os Pokémons
   };
 
   const loadMore = () => {
     setOffset(offset + 10);
   };
 
+  // Filtra os Pokémon com base no termo de pesquisa em allPokemons e no tipo selecionado
+  const filteredPokemons = allPokemons.filter((pokemon) => {
+    const matchesSearch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType ? pokemon.type === selectedType : true; // Filtra por tipo, se selecionado
+    return matchesSearch && matchesType;
+  });
+
+  // Lista de tipos de Pokémon
+  const types = Object.keys(typeColors);
+
   return (
     <Container>
-      <Title>Pokémon List</Title>
+      <TitleImage src="/pokemon-logo.png" alt="Pokémon List Title" /> {/* Substitua "your-image.png" pelo nome do seu arquivo */}
+      <FilterContainer> {/* Adicionando um contêiner para os filtros */}
+        <SearchInput
+          type="text"
+          placeholder="Pesquise pelo nome do Pokémon..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de pesquisa
+        />
+        <Dropdown onChange={(e) => setSelectedType(e.target.value)} value={selectedType}>
+          <option value=""></option> {/* Apenas a seta para baixo */}
+          {types.map((type) => (
+            <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+          ))}
+        </Dropdown>
+      </FilterContainer>
       <PokemonList>
-        {pokemons.map((pokemon) => (
+        {filteredPokemons.map((pokemon) => (
           <PokemonCard key={pokemon.name} to={`/pokemon/${pokemon.name}`} type={pokemon.type}>
             <PokemonImage src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`} alt={pokemon.name} />
             <h3>{pokemon.name}</h3>

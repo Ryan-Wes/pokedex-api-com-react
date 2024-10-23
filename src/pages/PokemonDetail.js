@@ -28,9 +28,9 @@ const typeColors = {
 
 const BackButton = styled.button`
   display: flex;
-  align-itens: center;
+  align-items: center;
   justify-content: center;
-  background-color: red;
+  background-color: #e63946; /* Vermelho escuro */
   border: none;
   color: white;
   padding: 20px 10px;
@@ -41,9 +41,8 @@ const BackButton = styled.button`
   margin-top: 15px;
   margin-left: 15px;
 
-
   &:hover {
-    background-color: black;
+    background-color: #d62839; /* Vermelho mais escuro ao passar o mouse */
   }
 `;
 
@@ -51,13 +50,14 @@ const Container = styled.div`
   padding: 20px;
   text-align: center;
   font-family: 'Arial', sans-serif;
-  background-color: #fff; /* Fundo branco */
+  background-color: #121212; /* Fundo escuro */
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Sombra mais forte */
   max-width: 800px; /* Aumentar a largura */
-  margin: 20px auto; /* Centralizar */
+  // margin: 0px auto; /* Centralizar */
   display: flex; /* Usar flexbox */
   flex-direction: column; /* Colunas */
+  
 `;
 
 const Header = styled.div`
@@ -75,8 +75,8 @@ const ButtonContainer = styled.div`
   left: 0;
   padding: 10px; /* Espaçamento ao redor do botão */
   z-index: 10;
+  background-color: #121212; /* Fundo escuro para o container do botão */
 `;
-
 
 const Image = styled.img`
   width: 250px; /* Aumentar a imagem */
@@ -92,12 +92,13 @@ const TextContainer = styled.div`
 const Name = styled.h1`
   margin: 0; /* Remover margens */
   font-size: 2em; /* Tamanho da fonte */
+  color: #ffffff; /* Cor do texto */
 `;
 
 const Type = styled.span`
   display: inline-flex; /* Para que o fundo se ajuste ao conteúdo */
   justify-content: center;
-  aligth-itens: center;
+  align-items: center; /* Corrigido "aligth-itens" para "align-items" */
   padding: 5px 10px; /* Espaçamento interno */
   border-radius: 20px; /* Bordas arredondadas */
   color: #fff; /* Cor do texto */
@@ -110,7 +111,7 @@ const Section = styled.div`
   padding: 10px;
   border: 1px solid #ccc; /* Borda para as seções */
   border-radius: 8px;
-  background-color: #f9f9f9; /* Fundo das seções */
+  background-color: #1e1e1e; /* Fundo das seções em escuro */
 `;
 
 const List = styled.ul`
@@ -124,7 +125,8 @@ const ListItem = styled.li`
   padding: 5px;
   border: 1px solid #ddd; /* Borda nas habilidades/movimentos */
   border-radius: 5px;
-  background-color: #fff; /* Fundo branco */
+  background-color: #000; /* Fundo branco */
+  color: white;
 `;
 
 const MoveContainer = styled.div`
@@ -139,11 +141,18 @@ const MoveItem = styled.div`
   border-radius: 15px; /* Bordas arredondadas */
   padding: 10px; /* Espaçamento interno */
   margin: 5px; /* Margem entre os movimentos */
-  flex: 1 0 130px; /* Flexível, mínimo 150px de largura */
+  flex: 1 0 130px; /* Flexível, mínimo 130px de largura */
   text-align: center; /* Alinhar o texto ao centro */
   color: #fff; /* Cor do texto */
 `;
 
+const Wrapper = styled.div`
+  background-color: #121212; /* Fundo escuro */
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  `;
 
 const PokemonDetail = () => {
   const { name } = useParams();
@@ -195,53 +204,49 @@ const PokemonDetail = () => {
   }
 
   return (
-
-    <>
-
-    <ButtonContainer>
+    <Wrapper>
+      <ButtonContainer>
         <BackButton onClick={() => navigate('/')}>
           Home
         </BackButton>
       </ButtonContainer>
 
-    <Container>
-      
+      <Container>
+        <Header>
+          <Image src={pokemon.sprites.other['official-artwork'].front_default} alt={pokemon.name} />
+          <TextContainer>
+            <Name>{pokemon.name}</Name>
+            {pokemon.types.map(typeInfo => (
+              <Type key={typeInfo.type.name} type={typeInfo.type.name}>
+                {typeInfo.type.name}
+              </Type>
+            ))}
+          </TextContainer>
+        </Header>
 
-      <Header>
-        <Image src={pokemon.sprites.other['official-artwork'].front_default} alt={pokemon.name} />
-        <TextContainer>
-          <Name>{pokemon.name}</Name>
-          {pokemon.types.map(typeInfo => (
-            <Type key={typeInfo.type.name} type={typeInfo.type.name}>
-              {typeInfo.type.name}
-            </Type>
-          ))}
-        </TextContainer>
-      </Header>
+        <Section>
+          <h2 style={{ color: '#ffffff' }}>Habilidades</h2>
+          <List>
+            {abilitiesDescriptions.map((ability) => (
+              <ListItem key={ability.name}>
+                <strong>{ability.name}</strong>: {ability.effect}
+              </ListItem>
+            ))}
+          </List>
+        </Section>
 
-      <Section>
-        <h2>Habilidades</h2>
-        <List>
-          {abilitiesDescriptions.map((ability) => (
-            <ListItem key={ability.name}>
-              <strong>{ability.name}</strong>: {ability.effect}
-            </ListItem>
-          ))}
-        </List>
-      </Section>
-
-      <Section>
-        <h2>Movimentos</h2>
-        <MoveContainer>
-          {moves.map((move) => (
-            <MoveItem key={move.name} type={move.type}>
-              {move.name}
-            </MoveItem>
-          ))}
-        </MoveContainer>
-      </Section>
-    </Container>
-    </>
+        <Section>
+          <h2 style={{ color: '#ffffff' }}>Movimentos</h2>
+          <MoveContainer>
+            {moves.map((move) => (
+              <MoveItem key={move.name} type={move.type}>
+                {move.name}
+              </MoveItem>
+            ))}
+          </MoveContainer>
+        </Section>
+      </Container>
+    </Wrapper>
   );
 };
 
